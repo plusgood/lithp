@@ -108,6 +108,9 @@ class Tokens(object):
 	def __iter__(self):
 		for x in self.tokens:
 			yield x
+			
+	def index(self, item):
+		return self.tokens.index(item)
 		
 
 
