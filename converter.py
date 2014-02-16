@@ -17,7 +17,7 @@ class Converter(object):
 		Code must be compiled wth lithp.hpp
 		"""
 		self.make_func_dict() #sets self.func_dict
-		
+		self.remove_lambda_nesting() #sets self.no_nest
 		self.converted = ''
 
 		return self.converted
@@ -37,7 +37,8 @@ class Converter(object):
 				#  expression)
 
 				#That expression can then be used as a function
-				#i.e. (  (\(...):type (...))  param1 param2 ...) Calls the lambda
+				#i.e. (  (\(...):type (...))  param1 param2 ...)
+				#     calls the lambda
 
 				#Parentheses around entire function
 				i = self.tokens.match_paren(index - 1)
@@ -54,7 +55,30 @@ class Converter(object):
 		return self.func_dict
 
 	def remove_lambda_nesting(self):
-		pass
+		"""
+		Removes any anonymous functions that are nested inside
+		other anonymous functions and replaces them with their
+		generated function names
+
+		Precondition: make_func_dict must have been called
+		"""
+		#A list like [[name1, body1], [name2, body2], ...]
+		self.no_nest = map(list, self.func_dict.items()) #lists so it can be mutable
+
+		#Sort by number of nested lambdas in function body
+		self.no_nest.sort(key = lambda n: n[1].count('\\'))
+
+		#Iterate through each pair of functions
+		#if one is present in another, replace its body with its name
+		for f in xrange(len(no_nest)):
+			for g in xrange(f + 1, len(no_nest)):
+				self.no_nest[g][1] = self.no_nest[g][1].replace(no_nest[f][1],
+																no_nest[f][0])
+
+		self.no_nest = dict(no_nest) #Convert n x 2 list back into dictionary
+
+		return self.no_nest
+
 
 	def make_func_declarations(self):
 		pass
