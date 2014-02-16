@@ -20,8 +20,6 @@
 #define div(a,b) ((a)/(b))
 #define mod(a,b) ((a)%(b))
 
-#define int long long
-
 int print(int d){
     return printf("%lld\\n", d);
 }
