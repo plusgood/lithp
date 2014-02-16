@@ -16,13 +16,42 @@ class Converter(object):
 		"""Converts the program into C++ code
 		Code must be compiled wth lithp.hpp
 		"""
-
+		self.make_func_dict() #sets self.func_dict
+		
 		self.converted = ''
 
 		return self.converted
 
 	def make_func_dict(self):
-		pass
+		"""Looks at tokens and forms dictionary
+		mapping generated function names to function
+		bodies
+		"""
+		index = 0
+		self.func_count = 0
+		self.func_dict = {}
+		while index < len(self.tokens):
+			if self.tokens[index] == '\\': #Lambda
+				#Every lambda looks like this:
+				#(\ (param1:type1, ...) : return_type
+				#  expression)
+
+				#That expression can then be used as a function
+				#i.e. (  (\(...):type (...))  param1 param2 ...) Calls the lambda
+
+				#Parentheses around entire function
+				i = self.tokens.match_paren(index - 1)
+
+				#Create unique function name
+				func_name = 'f%d' % func_count
+
+				#                           function body
+				self.func_dict[func_name] = self.tokens[x-1:i+1].get_joined()
+				self.func_count += 1
+
+			index += 1
+
+		return self.func_dict
 
 	def remove_lambda_nesting(self):
 		pass
