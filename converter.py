@@ -21,6 +21,21 @@ class Converter(object):
 
 		return self.converted
 
+	def make_func_dict(self):
+		pass
+
+	def remove_lambda_nesting(self):
+		pass
+
+	def make_func_declarations(self):
+		pass
+
+	def make_main_method(self):
+		pass
+
+	def replace_self_with_func_names(self):
+		pass
+
 	def get_cpp(self):
 		"""Return converted C++ code as a string
 		"""
