@@ -13,8 +13,7 @@ class Converter(object):
 		self.convert() #sets self.converted
 
 	def convert(self):
-		"""
-		Converts the program into C++ code
+		"""Converts the program into C++ code
 		Code must be compiled wth lithp.hpp
 		"""
 
@@ -23,4 +22,6 @@ class Converter(object):
 		return self.converted
 
 	def get_cpp(self):
+		"""Return converted C++ code as a string
+		"""
 		return self.converted

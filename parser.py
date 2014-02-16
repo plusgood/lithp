@@ -55,6 +55,7 @@ class Tokens(object):
 		Takes a list of strings that are tokens
 		"""
 		self.tokens = tokens
+		self.rejoin_tokens() #Sets self.joined
 
 	def match_paren(self, index):
 		"""Matches parenthesis at `index`,
@@ -85,7 +86,14 @@ class Tokens(object):
 
 		#Implmentation could change to avoid unnecessary spaces between
 		#parentheses etc.
-		return ' '.join(self.tokens)
+		self.joined = ' '.join(self.tokens)
+		return self.joined
+
+	def get_joined(self):
+		"""Returns tokens joined back together
+		into a string
+		"""
+		return self.joined
 		
 
 
