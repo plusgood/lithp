@@ -6,7 +6,7 @@ def main(argv):
 	try:
 		fp = argv[1]
 	except IndexError:
-		print("Usage: %s <filepath>" % argv[0])
+		print("Usage: %s <filepath>" % argv[0], file=sys.stderr)
 	try:
 		with open(fp) as f:
 			program = f.read()
