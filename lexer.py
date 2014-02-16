@@ -70,12 +70,12 @@ class Tokens(object):
 		else:
 			d = -1
 		
-		c = coeff #Counter for parentheses depth
+		c = d #Counter for parentheses depth
 		while c != 0:
 			index += d
-			if tokens[index] == ')':
+			if self.tokens[index] == ')':
 				c -= 1
-			elif tokens[index] == '(':
+			elif self.tokens[index] == '(':
 				c += 1
 
 
