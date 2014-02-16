@@ -3,7 +3,10 @@ from converter import Converter
 import sys
 
 def main(argv):
-	fp = argv[1]
+	try:
+		fp = argv[1]
+	except IndexError:
+		print("Usage: %s <filepath>" % argv[0])
 	try:
 		with open(fp) as f:
 			program = f.read()
