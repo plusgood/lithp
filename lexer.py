@@ -62,14 +62,17 @@ class Tokens(object):
 		returns index of matching parenthesis
 		"""
 		
-		assert self.tokens[index] == '(', \
+		assert self.tokens[index] in '()', \
 			   "Supplied index must point to a parenthesis"
+
+		if self.tokens[index] == '(':
+			coeff = 1
+		else:
+			coeff = -1
 		
-		c = 1 #Counter for parentheses depth
+		c = coeff #Counter for parentheses depth
 		while c != 0:
-			if c < 0:
-				raise LexingError, "Unbalanced parentheses"
-			index += 1
+			index += coeff
 			if tokens[index] == ')':
 				c -= 1
 			elif tokens[index] == '(':
@@ -112,9 +115,3 @@ class Tokens(object):
 	def index(self, item):
 		return self.tokens.index(item)
 		
-
-
-class LexingError(Exception):
-	pass
-
-	
