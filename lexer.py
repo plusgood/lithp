@@ -66,13 +66,13 @@ class Tokens(object):
 			   "Supplied index must point to a parenthesis"
 
 		if self.tokens[index] == '(':
-			coeff = 1
+			d = 1
 		else:
-			coeff = -1
+			d = -1
 		
 		c = coeff #Counter for parentheses depth
 		while c != 0:
-			index += coeff
+			index += d
 			if tokens[index] == ')':
 				c -= 1
 			elif tokens[index] == '(':
