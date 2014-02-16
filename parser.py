@@ -99,7 +99,11 @@ class Tokens(object):
 		return len(self.tokens)
 
 	def __getitem__(self, index):
-		return self.tokens[index]
+		result = self.tokens[index]
+		if hasattr(result, '__iter__'): #If they wanted a slice
+			return Tokens(result) #result is a sublist (a slice)
+		else:
+			return result #This is just a string
 
 	def __iter__(self):
 		for x in self.tokens:
