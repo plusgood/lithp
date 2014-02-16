@@ -1,7 +1,7 @@
 import re
 
 
-class Parser(object):
+class Lexer(object):
 	"""Takes a string and preprocesses and tokenizes it
 	"""
 
@@ -68,7 +68,7 @@ class Tokens(object):
 		c = 1 #Counter for parentheses depth
 		while c != 0:
 			if c < 0:
-				raise ParsingError, "Unbalanced parentheses"
+				raise LexingError, "Unbalanced parentheses"
 			index += 1
 			if tokens[index] == ')':
 				c -= 1
@@ -111,7 +111,7 @@ class Tokens(object):
 		
 
 
-class ParsingError(Exception):
+class LexingError(Exception):
 	pass
 
 	

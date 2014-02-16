@@ -1,5 +1,5 @@
 import re
-from parser import Parser
+from lexer import Lexer
 
 class Converter(object):
 	"""Takes a string that represents a raw
@@ -8,8 +8,8 @@ class Converter(object):
 
 	def __init__(self, program):
 		self.program = program
-		self.parser = Parser(program)
-		self.tokens = self.parser.get_tokens()
+		self.lexer = Lexer(program)
+		self.tokens = self.lexer.get_tokens()
 		self.convert() #sets self.converted
 
 	def convert(self):
