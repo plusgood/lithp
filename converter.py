@@ -18,6 +18,8 @@ class Converter(object):
 		"""
 		self.make_func_dict() #sets self.func_dict
 		self.remove_lambda_nesting() #sets self.no_nest
+		self.replace_self_with_func_names()
+
 		self.converted = ''
 
 		return self.converted
@@ -62,31 +64,30 @@ class Converter(object):
 
 		Precondition: make_func_dict must have been called
 		"""
-		#A list like [[name1, body1], [name2, body2], ...]
-		self.no_nest = map(list, self.func_dict.items()) #lists so it can be mutable
-
-		#Sort by number of nested lambdas in function body
-		self.no_nest.sort(key = lambda n: n[1].count('\\'))
 
 		#Iterate through each pair of functions
 		#if one is present in another, replace its body with its name
-		for f in xrange(len(no_nest)):
-			for g in xrange(f + 1, len(no_nest)):
-				self.no_nest[g][1] = self.no_nest[g][1].replace(no_nest[f][1],
-																no_nest[f][0])
+		for f in self.func_dict:
+			for g in self.func_dict:
+				if f == g: continue #Don't want to replace a function with itself!
+				self.func_dict[f] = self.func_dict[f].replace(self.func_dict[g], g)
 
-		self.no_nest = dict(no_nest) #Convert n x 2 list back into dictionary
+		return self.func_dict
 
-		return self.no_nest
-
+	def replace_self_with_func_names(self):
+		"""Replaces the context dependent Lithp
+		keyword `self` with the generated name
+		of the function in the C++ code
+		
+		Precondition: make_func_dict must have been called
+		"""
+		for name in self.func_dict:
+			self.func_dict[name] = self.func_dict[name].replace('self', name)
 
 	def make_func_declarations(self):
 		pass
 
 	def make_main_method(self):
-		pass
-
-	def replace_self_with_func_names(self):
 		pass
 
 	def get_cpp(self):
