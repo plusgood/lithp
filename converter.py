@@ -8,10 +8,15 @@ class Converter(object):
 
 	def __init__(self, program):
 		self.program = program
-		self.lexer = Lexer(program)
+		self.lexer = Lexer(self.program)
 		self.tokens = self.lexer.get_tokens()
+		self.typedefs = {} #{type_name : cpp_type}
+		self.func_count = 0
+		self.func_dict = {} #{func_name: func_body, ...}
+		#                                func_body includes everything
+		self.declarations = {} #{func_name : cpp_func_decl, ...}
+		self.converted = ''
 		self.convert() #sets self.converted
-		self.typedefs = {}
 
 	def convert(self):
 		"""Converts the program into C++ code
@@ -21,8 +26,6 @@ class Converter(object):
 		self.remove_lambda_nesting() #sets self.no_nest
 		self.replace_self_with_func_names()
 
-		self.converted = ''
-
 		return self.converted
 
 	def make_func_dict(self):
@@ -31,8 +34,6 @@ class Converter(object):
 		bodies
 		"""
 		index = 0
-		self.func_count = 0
-		self.func_dict = {}
 		while index < len(self.tokens):
 			if self.tokens[index] == '\\': #Lambda
 				#Every lambda looks like this:
@@ -50,7 +51,7 @@ class Converter(object):
 				func_name = 'f%d' % func_count
 
 				#                           function body
-				self.func_dict[func_name] = self.tokens[x-1:i+1].get_joined()
+				self.func_dict[func_name] = self.tokens[index-1:i+1].get_joined()
 				self.func_count += 1
 
 			index += 1
@@ -93,7 +94,7 @@ class Converter(object):
 
 		Precondition: make_func_dict must have been called
 		"""
-		self.declarations = {} #{func_name : func_decl, ...}
+
 		for name in self.func_dict:
 			body = Lexer(self.func_dict[name]).get_tokens()
 
@@ -124,12 +125,13 @@ class Converter(object):
 				index += 1
 
 			return_type = ''
+			#     +2 to skip over ")" and ":"
 			if body[j+2] == '(': #Function returns another function
 				#                                  +3 for [")","->","<type>"]
 				for x in xrange(j+2, body.match_paren(index)+3):
 					return_type += body[x]
 			else: #Function returns a concrete type
-				return_type = body[j+2] #Plus two to skip over ")" and ":"
+				return_type = body[j+2] #+2 to skip over ")" and ":"
 
 			func_type = self.convert_type(name, return_type)
 			self.declarations[name] = func_type + '(' + ', '.join(params) + ')'
