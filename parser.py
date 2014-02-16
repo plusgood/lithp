@@ -94,6 +94,16 @@ class Tokens(object):
 		into a string
 		"""
 		return self.joined
+
+	def __len__(self):
+		return len(self.tokens)
+
+	def __getitem__(self, index):
+		return self.tokens[index]
+
+	def __iter__(self):
+		for x in self.tokens:
+			yield x
 		
 
 
