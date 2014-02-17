@@ -6,6 +6,14 @@ class Converter(object):
 	Lithp program, and converts it to C++.
 	"""
 
+	TYPES_DICT = {
+		'int' : 'long long',
+		'double': 'double',
+		'float' : 'float',
+		'char' : 'char',
+		'bool' : 'bool',
+	}
+
 	def __init__(self, program):
 		self.program = program
 		self.lexer = Lexer(self.program)
@@ -48,7 +56,7 @@ class Converter(object):
 				i = self.tokens.match_paren(index - 1)
 
 				#Create unique function name
-				func_name = 'f%d' % func_count
+				func_name = 'f%d' % self.func_count
 
 				#                           function body
 				self.func_dict[func_name] = self.tokens[index-1:i+1].get_joined()
@@ -98,31 +106,15 @@ class Converter(object):
 		for name in self.func_dict:
 			body = Lexer(self.func_dict[name]).get_tokens()
 
-			i = body.index('\\') #Lambda
-
-			#Start of parameters
-			while body[i] != '(': i += 1
-
+			i = body.index('\\')  + 1 #Start of parameters
 			j = body.match_paren(i)
-			param_list = body[i + 1: j] #Stuff inside parentheses
+			param_tokens = body[i + 1: j] #Stuff inside parentheses
+			#			print "param list:", param_tokens
 
-			index = i+1
-			params = []
-			acc = '' #token accumulator
-
-			while index < len(param_list):
-				if param_list[index] == ',':
-					#Reached end of a parameter
-					var_name, type_str = acc.split(':')
-					params.append(self.convert_type(var_name, type_str))
-					acc = ''
-				elif param_list[index] == '(':
-					#Skip over parameters that are functions
-					index = param_list.match_paren(index)
-				else:
-					acc += param_list[index]
-
-				index += 1
+			params = self.split_params(param_tokens)
+			params = map(lambda n: n.split(':'), params) #params is now [[<name>,<type>],...]
+			c_types = map(lambda n: self.convert_type(*n), params)
+			#			print c_types
 
 			return_type = ''
 			#     +2 to skip over ")" and ":"
@@ -134,22 +126,72 @@ class Converter(object):
 				return_type = body[j+2] #+2 to skip over ")" and ":"
 
 			func_type = self.convert_type(name, return_type)
-			self.declarations[name] = func_type + '(' + ', '.join(params) + ')'
-			
+			#			print "params", params
+			#			print "c_types", c_types
+			#while True:exec raw_input() in globals(), locals()
+			self.declarations[name] = func_type + '(' + ', '.join(c_types) + ')'
+
+	
+	def split_params(self, params):
+		"""Takes params without surrounding parentheses
+		and splits them into a list. `params` is a Tokens
+		object
+		"""
+		index = 0
+		acc = ''
+		ret = [] #return value (is ret a bad name?)
+		while index < len(params):
+			if params[index] == ',': #End of a parameter
+				ret.append(acc)
+				acc = ''
+			elif params[index] == '(': #start of a type that is a function
+				end = params.match_paren(index)
+				while index <= end: #so the commas in the function type
+					#                are disregarded
+					acc += params[index]
+					index += 1
+				continue #so index doesn't get incremented again
+			else:
+				acc += params[index]
+			index += 1
+
+		if acc: #if they ended the list with a comma then acc would be ''
+			ret.append(acc) #parameters not ended with a comma,
+			#                acc last the last param
+
+		return ret
 
 	def convert_type(self, name, type):
-		"""Converts a string that constitutes a type
-		that may be simple (e.g. x:int, x:double)
-		or a function (e.g. x:(int,int)->int) into its
-		C++ definition. `name` may be an empty string.
-		This function may create a typedef and add it 
-		to self.typedefs in which case it will return
-		the new name.
+		"""Converts a string that is a name and a
+		string that constitutes a type that may
+		be simple (e.g. int, double) or a function 
+		(e.g. (int,int)->int) into its C++ definition.
+		`name` may be an empty string. This function
+		may create a typedef and add it to self.typedefs
+		in which case it will return the new name.
+		convert_type('x', 'int') => 'int x'
+		convert_type('x', '(int,double)->bool') => bool (*x)(int,double)
 		"""
-		
-		#Might need recursion due to higher order functions
-		pass
-			
+		#		print 'Called with name = %s and type = %s' %(name, type)
+		name = ''.join(name.split())
+		type = ''.join(type.split())
+
+		if re.match(r'\w+', type): #It's a concrete type
+			return self.TYPES_DICT[type] + ' ' + name
+
+		arrow = type.rfind('->')
+		assert arrow != -1, "If it's not a primitive, it must be a function"
+		params, return_type = type[:arrow], type[arrow+2:]
+		assert params[0] == '(' and params[-1] == ')'
+		params = params[1:-1]
+
+		params_tokenized = Lexer(params).get_tokens()
+		param_list = self.split_params(params_tokenized)
+		cpp_params = map(lambda n: self.convert_type('', n), param_list)
+		return_type = self.convert_type('', return_type)
+		return return_type + ' (*' + name + ')(' + ', '.join(cpp_params) + ')'
+
+					
 	def make_main_method(self):
 		pass
 
