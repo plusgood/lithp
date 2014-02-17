@@ -12,3 +12,6 @@
 - Simple to learn and implement
 - Fun (challenging) to use
 
+##TODO
+- Partial function application
+- Lists and list operations (map, folds, etc.)
