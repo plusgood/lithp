@@ -14,7 +14,8 @@ class Converter(object):
 		#These three can't be used as macros
 		'or' : 'or_',
 		'and' : 'and_',
-		'not' : 'not_'
+		'not' : 'not_',
+		'do' : ''
 	}
 
 	def __init__(self, program):
@@ -30,10 +31,7 @@ class Converter(object):
 		self.func_bodies = {} #{func_name: func_body, ...}
 		self.cpp_func_bodies = {} #{func_name: cpp_func_body, ...}
 		self.main = ''
-		self.cpp_main = ''
-
 		self.converted = ''
-
 		self.convert() #sets self.converted
 
 	def convert(self):
@@ -47,7 +45,23 @@ class Converter(object):
 		self.make_func_declarations() #sets self.cpp_declarations
 		self.make_func_bodies() #sets self.cpp_func_bodies		
 		self.make_cpp_func_bodies()
+		lines = []
+		lines.append('#include "lithp.hpp"')
+		for name, signature in self.cpp_declarations.iteritems():
+			lines.append(signature + ';')
 
+		for name, signature in self.cpp_declarations.iteritems():
+			if name == 'main': continue
+			lines.append(signature + '{')
+			lines.append('    return ' + self.cpp_func_bodies[name] + ';\n}')
+		lines.append(
+"""
+int main(){
+    %s;
+    return 0;
+}
+""" % self.cpp_func_bodies['main'])
+		self.converted = '\n'.join(lines)		
 		return self.converted
 
 	def make_func_dict(self):
@@ -145,7 +159,7 @@ class Converter(object):
 			#while True:exec raw_input() in globals(), locals()
 			self.cpp_declarations[name] = func_type + '(' + ', '.join(c_types) + ')'
 
-		self.cpp_declarations['main'] = 'int main()'
+		self.cpp_declarations['main'] = 'int main()' #actually this isn't used
 
 	def split_params(self, params):
 		"""Takes params without surrounding parentheses
@@ -202,7 +216,7 @@ class Converter(object):
 		param_list = self.split_params(params_tokenized)
 		cpp_params = map(lambda n: self.convert_type('', n), param_list)
 		return_type = self.convert_type('', return_type)
-		return return_type + ' (*' + name + ')(' + ', '.join(cpp_params) + ')'
+		return return_type + '(*' + name + ')(' + ','.join(cpp_params) + ')'
 
 
 	def make_func_bodies(self):
