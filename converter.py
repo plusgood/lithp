@@ -18,12 +18,19 @@ class Converter(object):
 		self.program = program
 		self.lexer = Lexer(self.program)
 		self.tokens = self.lexer.get_tokens()
+
+
+		#Initializations (some are pointless (self.main, self.converted))
 		self.typedefs = {} #{type_name : cpp_type}
 		self.func_count = 0
-		self.func_dict = {} #{func_name: func_body, ...}
-		#                                func_body includes everything
-		self.declarations = {} #{func_name : cpp_func_decl, ...}
+		self.func_dict = {} #{func_name: func_header_and_body, ...}
+		self.func_bodies = {} #{func_name: func_body, ...}
+		self.cpp_func_bodies = {} #{func_name: cpp_func_body, ...}
+		self.main = ''
+		self.cpp_main = ''
+		self.cpp_declarations = {} #{func_name : cpp_func_decl, ...}
 		self.converted = ''
+
 		self.convert() #sets self.converted
 
 	def convert(self):
@@ -31,9 +38,11 @@ class Converter(object):
 		Code must be compiled wth lithp.hpp
 		"""
 		self.make_func_dict() #sets self.func_dict
+		self.make_main_function()
 		self.remove_lambda_nesting() #sets self.no_nest
 		self.replace_self_with_func_names()
-
+		self.make_func_declarations()
+		self.make_func_bodies()
 		return self.converted
 
 	def make_func_dict(self):
@@ -105,14 +114,14 @@ class Converter(object):
 
 		for name in self.func_dict:
 			body = Lexer(self.func_dict[name]).get_tokens()
-
 			i = body.index('\\')  + 1 #Start of parameters
 			j = body.match_paren(i)
 			param_tokens = body[i + 1: j] #Stuff inside parentheses
 			#			print "param list:", param_tokens
 
 			params = self.split_params(param_tokens)
-			params = map(lambda n: n.split(':'), params) #params is now [[<name>,<type>],...]
+			params = map(lambda n: n.split(':'), params)
+			#params is now [[<name>,<type>],...]
 			c_types = map(lambda n: self.convert_type(*n), params)
 			#			print c_types
 
@@ -120,7 +129,7 @@ class Converter(object):
 			#     +2 to skip over ")" and ":"
 			if body[j+2] == '(': #Function returns another function
 				#                                  +3 for [")","->","<type>"]
-				for x in xrange(j+2, body.match_paren(index)+3):
+				for x in xrange(j+2, body.match_paren(j+2)+3):
 					return_type += body[x]
 			else: #Function returns a concrete type
 				return_type = body[j+2] #+2 to skip over ")" and ":"
@@ -129,9 +138,8 @@ class Converter(object):
 			#			print "params", params
 			#			print "c_types", c_types
 			#while True:exec raw_input() in globals(), locals()
-			self.declarations[name] = func_type + '(' + ', '.join(c_types) + ')'
+			self.cpp_declarations[name] = func_type + '(' + ', '.join(c_types) + ')'
 
-	
 	def split_params(self, params):
 		"""Takes params without surrounding parentheses
 		and splits them into a list. `params` is a Tokens
@@ -191,9 +199,36 @@ class Converter(object):
 		return_type = self.convert_type('', return_type)
 		return return_type + ' (*' + name + ')(' + ', '.join(cpp_params) + ')'
 
-					
-	def make_main_method(self):
-		pass
+
+	def make_func_bodies(self):
+		"""Extracts bodies of lambda functions
+		(as opposed to their headers). These bodies
+		will then be translated to a series of function
+		calls.
+		"""
+		for name in self.func_dict:
+			tok = Lexer(self.func_dict[name]).get_tokens()
+			end = tok.match_paren(0)
+			header_end = tok.match_paren(2)
+
+			if tok[header_end+2] == '(': #Function returns another function
+				start = body.match_paren(header_end+2)+3
+			else: #Function returns a concrete type
+				start = header_end+3
+			
+			self.func_bodies[name] = tok[start:end].get_joined()
+
+
+	def make_main_function(self):
+		"""Finds the outermost function call
+		which will go in the main method
+		This adds the function int main() to func_dict
+		and func_declarations.
+		"""
+		self.main = self.tokens.get_joined()
+		for func in self.func_dict:
+			self.main = self.main.replace(self.func_dict[func], func)
+		
 
 	def get_cpp(self):
 		"""Return converted C++ code as a string
