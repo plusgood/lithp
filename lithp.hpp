@@ -20,22 +20,22 @@
 #define div(a,b) ((a)/(b))
 #define mod(a,b) ((a)%(b))
 
-int print(int d){
-    return printf("%lld\\n", d);
+int print(long long d){
+    return printf("%lld\n", d);
 }
 
 int print(double f){
-    return printf("%f\\n", f);
+    return printf("%f\n", f);
 }
 
 int print(float f){
-    return printf("%f\\n", f);
+    return printf("%f\n", f);
 }
 
 int print(char c){
-    return printf("%c\\n", c);
+    return printf("%c\n", c);
 }
 
 int print(){
-    return printf("\\n");
+    return printf("\n");
 }
