@@ -24,14 +24,14 @@ class Converter(object):
 
 
 		#Initializations (some are pointless (self.main, self.converted))
-		self.typedefs = {} #{type_name : cpp_type}
 		self.func_count = 0
 		self.func_dict = {} #{func_name: func_header_and_body, ...}
+		self.cpp_declarations = {} #{func_name : cpp_func_decl, ...}
 		self.func_bodies = {} #{func_name: func_body, ...}
 		self.cpp_func_bodies = {} #{func_name: cpp_func_body, ...}
 		self.main = ''
 		self.cpp_main = ''
-		self.cpp_declarations = {} #{func_name : cpp_func_decl, ...}
+
 		self.converted = ''
 
 		self.convert() #sets self.converted
@@ -41,12 +41,11 @@ class Converter(object):
 		Code must be compiled wth lithp.hpp
 		"""
 		self.make_func_dict() #sets self.func_dict
-		self.make_main_function()
-		self.remove_lambda_nesting() #sets self.no_nest
+		self.make_main_function() #sets self.main
+		self.remove_lambda_nesting()
 		self.replace_self_with_func_names()
-		self.make_func_declarations()
-		self.make_func_bodies()
-		
+		self.make_func_declarations() #sets self.cpp_declarations
+		self.make_func_bodies() #sets self.cpp_func_bodies		
 		self.make_cpp_func_bodies()
 
 		return self.converted
@@ -182,9 +181,7 @@ class Converter(object):
 		string that constitutes a type that may
 		be simple (e.g. int, double) or a function 
 		(e.g. (int,int)->int) into its C++ definition.
-		`name` may be an empty string. This function
-		may create a typedef and add it to self.typedefs
-		in which case it will return the new name.
+		`name` may be an empty string.
 		convert_type('x', 'int') => 'int x'
 		convert_type('x', '(int,double)->bool') => bool (*x)(int,double)
 		"""
