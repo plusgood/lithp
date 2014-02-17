@@ -26,7 +26,7 @@ def main(argv):
 		f.write(converter.get_cpp())
 	
 	#-O2 is especially necessary for tail recursion optimization
-	return os.system('g++ -O2 -o %s.exe %s.cpp' % name)
+	return os.system('g++ -O2 -o %s.exe %s.cpp' % (name, name))
 
 
 if __name__ == '__main__':
