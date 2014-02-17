@@ -6,12 +6,15 @@ class Converter(object):
 	Lithp program, and converts it to C++.
 	"""
 
-	TYPES_DICT = {
+	TYPES_DICT = { #only types that change names when converted to C++
 		'int' : 'long long',
-		'double': 'double',
-		'float' : 'float',
-		'char' : 'char',
-		'bool' : 'bool',
+	}
+
+	FUNCS_DICT = { #only functions that change names when converted to C++
+		#These three can't be used as macros
+		'or' : 'or_',
+		'and' : 'and_',
+		'not' : 'not_'
 	}
 
 	def __init__(self, program):
@@ -43,6 +46,9 @@ class Converter(object):
 		self.replace_self_with_func_names()
 		self.make_func_declarations()
 		self.make_func_bodies()
+		
+		self.make_cpp_func_bodies()
+
 		return self.converted
 
 	def make_func_dict(self):
@@ -140,6 +146,8 @@ class Converter(object):
 			#while True:exec raw_input() in globals(), locals()
 			self.cpp_declarations[name] = func_type + '(' + ', '.join(c_types) + ')'
 
+		self.cpp_declarations['main'] = 'int main()'
+
 	def split_params(self, params):
 		"""Takes params without surrounding parentheses
 		and splits them into a list. `params` is a Tokens
@@ -185,7 +193,7 @@ class Converter(object):
 		type = ''.join(type.split())
 
 		if re.match(r'\w+', type): #It's a concrete type
-			return self.TYPES_DICT[type] + ' ' + name
+			return self.TYPES_DICT.get(type,type) + ' ' + name
 
 		arrow = type.rfind('->')
 		assert arrow != -1, "If it's not a primitive, it must be a function"
@@ -218,6 +226,8 @@ class Converter(object):
 			
 			self.func_bodies[name] = tok[start:end].get_joined()
 
+		self.func_bodies['main'] = self.main
+
 
 	def make_main_function(self):
 		"""Finds the outermost function call
@@ -228,7 +238,31 @@ class Converter(object):
 		self.main = self.tokens.get_joined()
 		for func in self.func_dict:
 			self.main = self.main.replace(self.func_dict[func], func)
-		
+
+	def make_cpp_func_bodies(self):
+		"""Use the extracted Lithp function bodies
+		and convert them to C style function calls.
+		i.e. (f a b) => f(a,b)
+		"""
+		for name, body in self.func_bodies.iteritems():
+			t = Lexer(body).get_tokens()			
+			S = [] #Stack
+			x = 0
+			while x < len(t):
+				if t[x] == '(': #function call begins
+					x += 1
+					S.append(self.FUNCS_DICT.get(t[x], t[x]) + '(')
+				elif t[x] == ')': #function call ends
+					acc = ''
+					while S[-1][-1] != '(':
+						#pop off params until function call is reached
+						acc = S.pop() + ',' + acc
+					# [:-1] to strip off comma at the end
+					S.append(S.pop() + acc[:-1] + ')') #S.pop() gives function
+				else:
+					S.append(t[x])
+				x += 1
+			self.cpp_func_bodies[name] =  S[0]
 
 	def get_cpp(self):
 		"""Return converted C++ code as a string
