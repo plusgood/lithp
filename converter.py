@@ -7,7 +7,11 @@ class Converter(object):
 	"""
 
 	TYPES_DICT = { #only types that change names when converted to C++
-		'int' : 'long long',
+		'int'   : 'long long',
+		'ints'  : 'vector<long long>',
+		'float' : 'double',
+		'floats' : 'vector<double>',
+		'chars' : 'vector<char>'
 	}
 
 	FUNCS_DICT = { #only functions that change names when converted to C++
@@ -15,7 +19,9 @@ class Converter(object):
 		'or' : 'or_',
 		'and' : 'and_',
 		'not' : 'not_',
-		'do' : ''
+
+		'do' : '' #this way do(a,b,c) becomes (a,b,c) which uses
+		          #the comma operator to execute a, b, and c
 	}
 
 	def __init__(self, program):
