@@ -46,12 +46,13 @@ vector<float> floats_nil;
 vector<double> doubles_nil;
 vector<char> chars_nil;
 
-template <class T>
-vector<T> map(T (*func)(T), vector<T> v){
-  for (typename vector<T>::iterator it = v.begin(); it != v.end(); ++it){
-    *it = func(*it);
+template <class T1, class T2>
+vector<T2> map(T2 (*func)(T1), vector<T1> v){
+  vector<T2> v2;
+  for (typename vector<T1>::iterator it = v.begin(); it != v.end(); ++it){
+    v2.push_back(func(*it));
   }
-  return v;
+  return v2;
 }
 
 template <class T>
