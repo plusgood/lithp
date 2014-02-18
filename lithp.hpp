@@ -40,7 +40,9 @@ void print(vector<T> v){
   cout << endl;
 }
 
-vector<long long> ints_nil;
+vector<int> ints_nil;
+vector<long long> longs_nil;
+vector<float> floats_nil;
 vector<double> doubles_nil;
 vector<char> chars_nil;
 
@@ -56,4 +58,12 @@ template <class T>
 vector<T> append(T item, vector<T> v){
   v.push_back(item);
   return v;
+}
+
+template <class T1, class T2>
+T1 foldl(T1 (*func)(T1, T2), T1 start, vector<T2> v){
+  for (typename vector<T2>::iterator it = v.begin(); it != v.end(); ++it){
+    start = func(start, *it);
+  }
+  return start;
 }

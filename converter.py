@@ -4,13 +4,17 @@ from lexer import Lexer
 class Converter(object):
 	"""Takes a string that represents a raw
 	Lithp program, and converts it to C++.
+	All of this is done at construction,
+	and the C++ code can be accessed with
+	the .get_cpp() method.
 	"""
 
 	TYPES_DICT = { #only types that change names when converted to C++
-		'int'   : 'long long',
-		'ints'  : 'vector<long long>',
-		'float' : 'double',
-		'floats' : 'vector<double>',
+		'long'   : 'long long',
+		'ints'  : 'vector<int>',
+		'longs' : 'vector<long long>',
+		'floats' : 'vector<float>',
+		'doubles' : 'vector<double>',
 		'chars' : 'vector<char>'
 	}
 
@@ -277,9 +281,16 @@ int main(){
 					# [:-1] to strip off comma at the end
 					S.append(S.pop() + acc[:-1] + ')') #S.pop() gives function
 				else:
-					S.append(t[x])
+					S.append(self.convert_atom(t[x]))
 				x += 1
 			self.cpp_func_bodies[name] =  S[0]
+
+	def convert_atom(self, atom):
+		"""Converts the Lithp atom given as a
+		string into its corresponding C++ atom.
+		Right now this doesn't do anything...
+		"""
+		return atom
 
 	def get_cpp(self):
 		"""Return converted C++ code as a string
