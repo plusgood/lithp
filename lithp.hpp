@@ -28,16 +28,18 @@ using namespace std;
 #define index(v,i) (v[i])
 
 template<class T>
-void print(T a){
+int print(T a){
   cout << a << endl;
+  return 0;
 }
 
 template<class T>
-void print(vector<T> v){
+int print(vector<T> v){
   for(typename vector<T>::iterator it = v.begin(); it != v.end(); ++it){
     cout << (*it) << " ";
   }
   cout << endl;
+  return 0;
 }
 
 vector<int> ints_nil;
