@@ -10,22 +10,22 @@ class Converter(object):
 	"""
 
 	TYPES_DICT = { #only types that change names when converted to C++
-		'long'   : 'long long',
-		'ints'  : 'vector<int>',
-		'longs' : 'vector<long long>',
-		'floats' : 'vector<float>',
+		'long'    : 'long long',
+		'ints'    : 'vector<int>',
+		'longs'   : 'vector<long long>',
+		'floats'  : 'vector<float>',
 		'doubles' : 'vector<double>',
-		'chars' : 'vector<char>'
+		'chars'   : 'vector<char>'
 	}
 
 	FUNCS_DICT = { #only functions that change names when converted to C++
 		#These three can't be used as macros
-		'or' : 'or_',
+		'or'  : 'or_',
 		'and' : 'and_',
 		'not' : 'not_',
 
-		'do' : '' #this way do(a,b,c) becomes (a,b,c) which uses
-		          #the comma operator to execute a, b, and c
+		'do'  : '' #this way do(a,b,c) becomes (a,b,c) which uses
+		           #the comma operator to execute a, b, and c
 	}
 
 	def __init__(self, program):
