@@ -28,8 +28,11 @@ class Lexer(object):
 
 		#Split by delimiters
 		delims = map(re.escape, self.DELIMITERS)
+
 		#Parentheses surrounding entire regex mean save the delimiters
-		delim_re = '(\\s+|' + '|'.join(delims) + ')'
+
+		#       whitespace and strings
+		delim_re = '(\\s+|"[^"]*"|' + '|'.join(delims) + ')'
 		token_list = re.split(delim_re, self.program)
 
 		#Removes strings that are empty or contain only whitespace
