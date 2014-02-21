@@ -69,6 +69,15 @@ T1 foldl(T1 (*func)(T1, T2), T1 start, vector<T2> v){
   return start;
 }
 
+template <class T>
+T sum(vector<T> v){
+  T acc = 0;
+  for (typename vector<T>::iterator it = v.begin(); it != v.end(); ++it){
+    acc += *it;
+  }
+  return acc;
+}
+
 vector<int> range(int start, int stop, int step=1){
   vector<int> v;
   for(int i = start; i < stop; i += step){
