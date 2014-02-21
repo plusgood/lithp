@@ -69,7 +69,7 @@ T1 foldl(T1 (*func)(T1, T2), T1 start, vector<T2> v){
   return start;
 }
 
-vector<int> range(int start, int stop, int step){
+vector<int> range(int start, int stop, int step=1){
   vector<int> v;
   for(int i = start; i < stop; i += step){
     v.push_back(i);
