@@ -1,8 +1,8 @@
 (print
- ((\ (n:int):int
-   (sub
-    ((\ (n:int):int
-      (mult n n))
-     (div (mult n (add n 1)) 2))
-    (div (mult n (mult (add n 1) (add (mult n 2) 1))) 6)))
-  100))
+ ((\ (square:(int)->int, numbers:ints) : int
+    (sub
+     (square (sum numbers))
+     (sum (map square numbers))))
+
+  (\ (n:int):int (mult n n)) #square
+  (range 1 101))) #1 to 100
