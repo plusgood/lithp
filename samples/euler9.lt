@@ -1,0 +1,9 @@
+(print
+ ((\ (a:int, b:int):int
+  (if (eq (add (mult a a) (mult b b)) (mult (sub 1000 (add a b)) (sub 1000 (add a b))))
+   (mult (mult a b) (sub 1000 (add a b)))
+   (if (gte a 1000)
+    0
+    (if (gte b 1000)
+     (self (add a 1) 1)
+     (self a (add b 1)))))) 1 1))
