@@ -6,27 +6,6 @@
 
 using namespace std;
 
-#define if(a,b,c) ((a)?(b):(c))
-#define lt(a,b) ((a)<(b))
-#define lte(a,b) ((a)<=(b))
-#define gt(a,b) ((a)>(b))
-#define gte(a,b) ((a)>=(b))
-#define eq(a,b) ((a)==(b))
-#define neq(a,b) ((a)!=(b))
-
-//Underscores because not, and, or are keywords
-#define not_(a) (!(a)) 
-#define and_(a,b) ((a)&&(b))
-#define or_(a,b) ((a)||(b))
-
-#define add(a,b) ((a)+(b))
-#define sub(a,b) ((a)-(b))
-#define mult(a,b) ((a)*(b))
-#define div(a,b) ((a)/(b))
-#define mod(a,b) ((a)%(b))
-
-#define index(v,i) (v[i])
-
 template<class T>
 int print(T a){
   cout << a << endl;
@@ -87,3 +66,38 @@ vector<int> range(int start, int stop, int step=1){
   }
   return v;
 }
+
+template<class T>
+bool is_nil(const vector<T> &v){
+  return v.empty();
+}
+
+template <class T>
+vector<T> tail(const vector<T> &v){
+  if (v.empty())
+    return v;
+  return vector<T>(v.begin()+1, v.end());
+}
+
+
+
+#define if(a,b,c) ((a)?(b):(c))
+#define lt(a,b) ((a)<(b))
+#define lte(a,b) ((a)<=(b))
+#define gt(a,b) ((a)>(b))
+#define gte(a,b) ((a)>=(b))
+#define eq(a,b) ((a)==(b))
+#define neq(a,b) ((a)!=(b))
+
+//Underscores because not, and, or are keywords
+#define not_(a) (!(a)) 
+#define and_(a,b) ((a)&&(b))
+#define or_(a,b) ((a)||(b))
+
+#define add(a,b) ((a)+(b))
+#define sub(a,b) ((a)-(b))
+#define mult(a,b) ((a)*(b))
+#define div(a,b) ((a)/(b))
+#define mod(a,b) ((a)%(b))
+
+#define index(v,i) (v[i])
