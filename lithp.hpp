@@ -79,6 +79,10 @@ vector<T> tail(const vector<T> &v){
   return vector<T>(v.begin()+1, v.end());
 }
 
+template <class T>
+vector<T> repeat(T item, int times){
+  return vector<T>(times, item);
+}
 
 
 #define if(a,b,c) ((a)?(b):(c))
@@ -101,3 +105,4 @@ vector<T> tail(const vector<T> &v){
 #define mod(a,b) ((a)%(b))
 
 #define index(v,i) (v[i])
+#define set(v, i, val) (v[i]=val,v)
