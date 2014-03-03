@@ -1,0 +1,27 @@
+#Yes, I know the answer is just 40!/(20!20!), but
+#The goal of this is to demonstrate memoization
+#It is possible! (Although extremely memory inefficient)
+#Also stimulating 2d arrays with 1d vectors is a pain
+#The runtime is still extremely good, even with all this
+
+(print
+ (index
+  ((\ (x:int, y:int, mem:longs): longs
+    (if (or
+         (or (gt x 20) (gt y 20))
+         (neq 0 (index mem (add (mult x 21) y))))
+      mem
+      ((\ (x:int, y:int, mem:longs): longs
+        (set mem (add (mult x 21) y)
+         (add
+          (if (lt x 20)
+           (index mem (add (mult (add x 1) 21) y))
+           0)
+          (if (lt y 20)
+           (index mem (add (mult x 21) (add y 1)))
+           0))))
+        x y (self x (add y 1) (self (add x 1) y mem)))))
+     0 0 ((\ (mem:longs):longs
+           (set mem 440 1LL))
+          (repeat 0LL 441)))
+   0))
